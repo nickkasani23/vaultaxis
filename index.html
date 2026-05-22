@@ -1,0 +1,970 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>VaultAxis – Identity Security, Redefined</title>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --navy:    #07142a;
+      --navy2:   #0d2045;
+      --navy3:   #112659;
+      --gold:    #e8a020;
+      --gold2:   #f5b93e;
+      --teal:    #00c4b3;
+      --white:   #ffffff;
+      --light:   #f4f6fb;
+      --gray:    #8a9ab5;
+      --text:    #1a2740;
+      --border:  rgba(255,255,255,0.12);
+    }
+
+    html { scroll-behavior: smooth; }
+    body { font-family: 'Segoe UI', system-ui, -apple-system, sans-serif; color: var(--text); background: var(--white); }
+
+    /* ── NAVBAR ── */
+    nav {
+      position: fixed; top: 0; left: 0; right: 0; z-index: 1000;
+      background: var(--navy);
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 0 40px; height: 70px;
+      border-bottom: 1px solid var(--border);
+    }
+    .nav-logo {
+      display: flex; align-items: center; gap: 10px;
+      text-decoration: none;
+    }
+    .nav-logo-icon {
+      width: 38px; height: 38px;
+      background: linear-gradient(135deg, var(--gold), var(--gold2));
+      border-radius: 8px;
+      display: flex; align-items: center; justify-content: center;
+    }
+    .nav-logo-icon svg { width: 22px; height: 22px; }
+    .nav-logo-text { font-size: 1.4rem; font-weight: 700; color: var(--white); letter-spacing: -0.5px; }
+    .nav-logo-text span { color: var(--gold); }
+
+    .nav-links {
+      display: flex; align-items: center; gap: 4px;
+      list-style: none;
+    }
+    .nav-links > li { position: relative; }
+    .nav-links > li > a {
+      color: rgba(255,255,255,0.88); font-size: 0.88rem; font-weight: 500;
+      text-decoration: none; padding: 8px 14px; border-radius: 6px;
+      display: flex; align-items: center; gap: 5px;
+      transition: background 0.2s, color 0.2s;
+    }
+    .nav-links > li > a:hover { background: rgba(255,255,255,0.08); color: var(--white); }
+    .nav-links > li > a .chevron {
+      width: 10px; height: 10px; border-right: 2px solid currentColor;
+      border-bottom: 2px solid currentColor; transform: rotate(45deg);
+      margin-top: -3px; transition: transform 0.2s;
+    }
+    .nav-links > li:hover > a .chevron { transform: rotate(-135deg); margin-top: 3px; }
+
+    /* dropdown */
+    .dropdown {
+      display: none; position: absolute; top: calc(100% + 8px); left: 0;
+      background: var(--navy2); border: 1px solid var(--border);
+      border-radius: 10px; min-width: 220px; padding: 8px;
+      box-shadow: 0 20px 50px rgba(0,0,0,0.4);
+    }
+    .nav-links > li:hover .dropdown { display: block; }
+    .dropdown a {
+      display: block; color: rgba(255,255,255,0.82); font-size: 0.85rem;
+      padding: 10px 14px; border-radius: 6px; text-decoration: none;
+      transition: background 0.15s, color 0.15s;
+    }
+    .dropdown a:hover { background: rgba(255,255,255,0.08); color: var(--white); }
+    .dropdown-label {
+      font-size: 0.7rem; font-weight: 700; letter-spacing: 1px;
+      text-transform: uppercase; color: var(--gold); padding: 10px 14px 4px;
+    }
+
+    .nav-actions { display: flex; align-items: center; gap: 12px; }
+    .btn-ghost {
+      color: rgba(255,255,255,0.88); font-size: 0.87rem; font-weight: 500;
+      text-decoration: none; padding: 8px 16px; border-radius: 6px;
+      transition: background 0.2s;
+    }
+    .btn-ghost:hover { background: rgba(255,255,255,0.08); }
+    .btn-cta {
+      background: var(--gold); color: var(--navy); font-size: 0.87rem;
+      font-weight: 700; text-decoration: none; padding: 10px 20px;
+      border-radius: 6px; transition: background 0.2s, transform 0.15s;
+      white-space: nowrap;
+    }
+    .btn-cta:hover { background: var(--gold2); transform: translateY(-1px); }
+
+    /* ── HERO ── */
+    .hero {
+      background: linear-gradient(160deg, var(--navy) 0%, var(--navy3) 50%, #1a3a6e 100%);
+      padding: 160px 40px 100px;
+      position: relative; overflow: hidden;
+    }
+    .hero::before {
+      content: ''; position: absolute; inset: 0;
+      background: url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23ffffff' fill-opacity='0.03'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E");
+    }
+    .hero-inner {
+      max-width: 1200px; margin: 0 auto;
+      display: grid; grid-template-columns: 1fr 1fr; gap: 60px; align-items: center;
+      position: relative;
+    }
+    .hero-badge {
+      display: inline-flex; align-items: center; gap: 8px;
+      background: rgba(232,160,32,0.15); border: 1px solid rgba(232,160,32,0.35);
+      color: var(--gold2); font-size: 0.78rem; font-weight: 600;
+      padding: 6px 14px; border-radius: 50px; margin-bottom: 24px;
+      letter-spacing: 0.5px;
+    }
+    .hero-badge::before {
+      content: ''; width: 7px; height: 7px; border-radius: 50%;
+      background: var(--gold); animation: pulse 2s infinite;
+    }
+    @keyframes pulse { 0%,100%{opacity:1;transform:scale(1)} 50%{opacity:0.5;transform:scale(1.3)} }
+
+    .hero h1 {
+      font-size: 3.2rem; font-weight: 800; color: var(--white);
+      line-height: 1.12; letter-spacing: -1px; margin-bottom: 20px;
+    }
+    .hero h1 em { font-style: normal; color: var(--gold); }
+    .hero p {
+      color: rgba(255,255,255,0.72); font-size: 1.1rem; line-height: 1.7;
+      margin-bottom: 36px; max-width: 520px;
+    }
+    .hero-btns { display: flex; gap: 14px; flex-wrap: wrap; }
+    .btn-primary {
+      background: var(--gold); color: var(--navy); font-weight: 700;
+      font-size: 0.95rem; padding: 14px 28px; border-radius: 8px;
+      text-decoration: none; transition: all 0.2s;
+      box-shadow: 0 4px 20px rgba(232,160,32,0.35);
+    }
+    .btn-primary:hover { background: var(--gold2); transform: translateY(-2px); box-shadow: 0 8px 30px rgba(232,160,32,0.45); }
+    .btn-outline {
+      border: 2px solid rgba(255,255,255,0.35); color: var(--white);
+      font-weight: 600; font-size: 0.95rem; padding: 14px 28px;
+      border-radius: 8px; text-decoration: none; transition: all 0.2s;
+    }
+    .btn-outline:hover { border-color: var(--white); background: rgba(255,255,255,0.08); }
+
+    /* hero visual */
+    .hero-visual {
+      position: relative; display: flex; justify-content: center; align-items: center;
+    }
+    .hero-card {
+      background: rgba(255,255,255,0.06); border: 1px solid rgba(255,255,255,0.12);
+      border-radius: 20px; padding: 32px; width: 100%; max-width: 420px;
+      backdrop-filter: blur(10px);
+    }
+    .hero-card-title {
+      color: rgba(255,255,255,0.5); font-size: 0.75rem; font-weight: 600;
+      letter-spacing: 1px; text-transform: uppercase; margin-bottom: 20px;
+    }
+    .shield-wrap {
+      display: flex; justify-content: center; margin-bottom: 24px;
+    }
+    .shield-svg { width: 120px; height: 120px; }
+    .hero-stat-row {
+      display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 12px;
+    }
+    .hero-stat {
+      background: rgba(255,255,255,0.06); border-radius: 10px; padding: 14px 10px; text-align: center;
+    }
+    .hero-stat .num { font-size: 1.5rem; font-weight: 800; color: var(--white); }
+    .hero-stat .lbl { font-size: 0.68rem; color: rgba(255,255,255,0.5); margin-top: 2px; }
+    .float-badge {
+      position: absolute; background: rgba(0,196,179,0.15);
+      border: 1px solid rgba(0,196,179,0.4); border-radius: 10px;
+      padding: 10px 16px; color: var(--teal); font-size: 0.82rem; font-weight: 600;
+      display: flex; align-items: center; gap: 8px;
+      animation: float 4s ease-in-out infinite;
+    }
+    .float-badge-1 { top: -10px; right: -20px; }
+    .float-badge-2 { bottom: 10px; left: -30px; animation-delay: 2s; }
+    @keyframes float { 0%,100%{transform:translateY(0)} 50%{transform:translateY(-10px)} }
+    .dot-teal { width:8px;height:8px;border-radius:50%;background:var(--teal); }
+    .dot-gold { width:8px;height:8px;border-radius:50%;background:var(--gold); }
+
+    /* ── TRUST BAR ── */
+    .trust {
+      background: var(--navy2); padding: 32px 40px;
+      border-top: 1px solid var(--border); border-bottom: 1px solid var(--border);
+    }
+    .trust-inner { max-width: 1200px; margin: 0 auto; }
+    .trust p {
+      text-align: center; color: rgba(255,255,255,0.45); font-size: 0.78rem;
+      font-weight: 600; letter-spacing: 1.5px; text-transform: uppercase; margin-bottom: 24px;
+    }
+    .trust-logos {
+      display: flex; justify-content: center; align-items: center;
+      gap: 50px; flex-wrap: wrap;
+    }
+    .trust-logo {
+      color: rgba(255,255,255,0.3); font-size: 1.1rem; font-weight: 800;
+      letter-spacing: -0.5px; transition: color 0.2s;
+    }
+    .trust-logo:hover { color: rgba(255,255,255,0.6); }
+
+    /* ── SECTION COMMON ── */
+    section { padding: 90px 40px; }
+    .section-inner { max-width: 1200px; margin: 0 auto; }
+    .section-label {
+      font-size: 0.75rem; font-weight: 700; letter-spacing: 1.5px;
+      text-transform: uppercase; color: var(--gold); margin-bottom: 12px;
+    }
+    .section-title {
+      font-size: 2.4rem; font-weight: 800; color: var(--navy);
+      line-height: 1.2; letter-spacing: -0.5px; margin-bottom: 16px;
+    }
+    .section-sub {
+      color: #5a6b8a; font-size: 1.05rem; line-height: 1.7; max-width: 600px;
+    }
+    .section-header { margin-bottom: 56px; }
+    .section-header.center { text-align: center; }
+    .section-header.center .section-sub { margin: 0 auto; }
+
+    /* ── PRODUCTS ── */
+    .products { background: var(--light); }
+    .products-grid {
+      display: grid; grid-template-columns: repeat(3, 1fr); gap: 24px;
+    }
+    .prod-card {
+      background: var(--white); border-radius: 16px; padding: 32px;
+      border: 1px solid #e2e8f0;
+      transition: transform 0.25s, box-shadow 0.25s, border-color 0.25s;
+      cursor: default;
+    }
+    .prod-card:hover {
+      transform: translateY(-6px);
+      box-shadow: 0 20px 50px rgba(7,20,42,0.12);
+      border-color: var(--gold);
+    }
+    .prod-icon {
+      width: 52px; height: 52px; border-radius: 12px;
+      display: flex; align-items: center; justify-content: center;
+      margin-bottom: 20px; font-size: 1.5rem;
+    }
+    .prod-card h3 { font-size: 1.15rem; font-weight: 700; color: var(--navy); margin-bottom: 10px; }
+    .prod-card p { color: #5a6b8a; font-size: 0.9rem; line-height: 1.65; margin-bottom: 20px; }
+    .prod-link {
+      color: var(--navy3); font-size: 0.87rem; font-weight: 600;
+      text-decoration: none; display: inline-flex; align-items: center; gap: 6px;
+      transition: gap 0.2s, color 0.2s;
+    }
+    .prod-link:hover { color: var(--gold); gap: 10px; }
+    .prod-link::after { content: '→'; }
+
+    /* ── SOLUTIONS ── */
+    .solutions { background: var(--white); }
+    .solutions-layout {
+      display: grid; grid-template-columns: 1fr 1fr; gap: 60px; align-items: center;
+    }
+    .solutions-tabs { display: flex; flex-direction: column; gap: 4px; }
+    .sol-tab {
+      padding: 20px 24px; border-radius: 12px; cursor: pointer;
+      border: 2px solid transparent; transition: all 0.2s;
+    }
+    .sol-tab:hover { background: var(--light); }
+    .sol-tab.active { background: var(--light); border-color: var(--gold); }
+    .sol-tab h4 { font-size: 1rem; font-weight: 700; color: var(--navy); margin-bottom: 4px; }
+    .sol-tab p { font-size: 0.87rem; color: #5a6b8a; line-height: 1.5; }
+    .sol-tab .sol-num {
+      font-size: 0.7rem; font-weight: 700; letter-spacing: 1px; color: var(--gold);
+      text-transform: uppercase; margin-bottom: 6px;
+    }
+    .solutions-visual {
+      background: linear-gradient(135deg, var(--navy) 0%, var(--navy3) 100%);
+      border-radius: 20px; padding: 48px 40px; min-height: 440px;
+      display: flex; flex-direction: column; justify-content: center;
+      position: relative; overflow: hidden;
+    }
+    .solutions-visual::after {
+      content: ''; position: absolute; width: 300px; height: 300px; border-radius: 50%;
+      background: rgba(232,160,32,0.08); bottom: -100px; right: -100px;
+    }
+    .sol-vis-label { color: var(--gold); font-size: 0.75rem; font-weight: 700;
+      letter-spacing: 1.5px; text-transform: uppercase; margin-bottom: 20px; }
+    .sol-vis-title { color: var(--white); font-size: 1.8rem; font-weight: 800; margin-bottom: 16px; line-height: 1.2; }
+    .sol-vis-desc { color: rgba(255,255,255,0.65); font-size: 0.95rem; line-height: 1.7; margin-bottom: 28px; }
+    .sol-features { list-style: none; display: flex; flex-direction: column; gap: 10px; }
+    .sol-features li {
+      color: rgba(255,255,255,0.82); font-size: 0.9rem;
+      display: flex; align-items: center; gap: 10px;
+    }
+    .sol-features li::before {
+      content: ''; width: 18px; height: 18px; border-radius: 50%;
+      background: rgba(232,160,32,0.2); border: 1.5px solid var(--gold);
+      flex-shrink: 0; display: flex; align-items: center; justify-content: center;
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='8' viewBox='0 0 10 8'%3E%3Cpath d='M1 4l3 3 5-6' stroke='%23e8a020' stroke-width='1.5' fill='none' stroke-linecap='round'/%3E%3C/svg%3E");
+      background-repeat: no-repeat; background-position: center;
+    }
+
+    /* ── STATS ── */
+    .stats {
+      background: var(--navy);
+      position: relative; overflow: hidden;
+    }
+    .stats::before {
+      content: ''; position: absolute; inset: 0;
+      background: linear-gradient(135deg, transparent 60%, rgba(232,160,32,0.06));
+    }
+    .stats-inner {
+      max-width: 1200px; margin: 0 auto;
+      display: grid; grid-template-columns: 1fr 1fr; gap: 80px; align-items: center;
+    }
+    .stats-text h2 { font-size: 2.4rem; font-weight: 800; color: var(--white); line-height: 1.2; margin-bottom: 20px; }
+    .stats-text p { color: rgba(255,255,255,0.65); font-size: 1rem; line-height: 1.7; margin-bottom: 32px; }
+    .stats-grid {
+      display: grid; grid-template-columns: 1fr 1fr; gap: 2px;
+      border-radius: 16px; overflow: hidden;
+    }
+    .stat-box {
+      background: rgba(255,255,255,0.05); padding: 36px 28px;
+      border: 1px solid rgba(255,255,255,0.08);
+      transition: background 0.2s;
+    }
+    .stat-box:hover { background: rgba(255,255,255,0.09); }
+    .stat-num { font-size: 2.8rem; font-weight: 900; color: var(--gold); line-height: 1; }
+    .stat-suffix { font-size: 1.8rem; }
+    .stat-lbl { color: rgba(255,255,255,0.6); font-size: 0.88rem; margin-top: 8px; line-height: 1.4; }
+
+    /* ── HOW IT WORKS ── */
+    .how { background: var(--light); }
+    .steps-grid { display: grid; grid-template-columns: repeat(4,1fr); gap: 0; position: relative; }
+    .steps-grid::before {
+      content: ''; position: absolute; top: 40px; left: calc(12.5%); right: calc(12.5%);
+      height: 2px; background: linear-gradient(90deg, var(--gold), var(--teal));
+      z-index: 0;
+    }
+    .step { text-align: center; padding: 0 20px; position: relative; z-index: 1; }
+    .step-num {
+      width: 56px; height: 56px; border-radius: 50%; margin: 0 auto 20px;
+      display: flex; align-items: center; justify-content: center;
+      font-weight: 900; font-size: 1.1rem; color: var(--navy);
+      background: linear-gradient(135deg, var(--gold), var(--gold2));
+      box-shadow: 0 4px 20px rgba(232,160,32,0.4);
+    }
+    .step h4 { font-size: 1rem; font-weight: 700; color: var(--navy); margin-bottom: 8px; }
+    .step p { font-size: 0.87rem; color: #5a6b8a; line-height: 1.6; }
+
+    /* ── TESTIMONIALS ── */
+    .testimonials { background: var(--white); }
+    .testi-grid { display: grid; grid-template-columns: repeat(3,1fr); gap: 24px; }
+    .testi-card {
+      background: var(--light); border-radius: 16px; padding: 32px;
+      border: 1px solid #e2e8f0; transition: box-shadow 0.25s;
+    }
+    .testi-card:hover { box-shadow: 0 12px 40px rgba(7,20,42,0.1); }
+    .testi-stars { color: var(--gold); font-size: 1.1rem; margin-bottom: 16px; }
+    .testi-card blockquote {
+      color: #3a4a65; font-size: 0.95rem; line-height: 1.7;
+      font-style: italic; margin-bottom: 24px;
+      border-left: 3px solid var(--gold); padding-left: 16px;
+    }
+    .testi-person { display: flex; align-items: center; gap: 12px; }
+    .testi-avatar {
+      width: 44px; height: 44px; border-radius: 50%;
+      display: flex; align-items: center; justify-content: center;
+      font-weight: 700; font-size: 1rem; color: var(--white);
+    }
+    .testi-name { font-weight: 700; font-size: 0.9rem; color: var(--navy); }
+    .testi-role { font-size: 0.8rem; color: var(--gray); }
+
+    /* ── CTA BANNER ── */
+    .cta-banner {
+      background: linear-gradient(135deg, var(--navy) 0%, var(--navy3) 100%);
+      text-align: center; padding: 90px 40px;
+      position: relative; overflow: hidden;
+    }
+    .cta-banner::before {
+      content: ''; position: absolute; width: 600px; height: 600px;
+      border-radius: 50%; background: rgba(232,160,32,0.06);
+      top: -200px; left: 50%; transform: translateX(-50%);
+    }
+    .cta-banner h2 {
+      font-size: 2.8rem; font-weight: 800; color: var(--white);
+      line-height: 1.2; margin-bottom: 16px; position: relative;
+    }
+    .cta-banner h2 em { font-style: normal; color: var(--gold); }
+    .cta-banner p {
+      color: rgba(255,255,255,0.65); font-size: 1.1rem; margin-bottom: 36px; position: relative;
+    }
+    .cta-banner .hero-btns { justify-content: center; }
+
+    /* ── FOOTER ── */
+    footer {
+      background: #040e1e; padding: 70px 40px 30px;
+      border-top: 1px solid rgba(255,255,255,0.06);
+    }
+    .footer-inner { max-width: 1200px; margin: 0 auto; }
+    .footer-top {
+      display: grid; grid-template-columns: 2fr 1fr 1fr 1fr 1fr; gap: 40px;
+      margin-bottom: 60px;
+    }
+    .footer-brand p {
+      color: rgba(255,255,255,0.45); font-size: 0.87rem; line-height: 1.7;
+      margin: 16px 0 24px;
+    }
+    .footer-socials { display: flex; gap: 10px; }
+    .social-btn {
+      width: 36px; height: 36px; border-radius: 8px;
+      background: rgba(255,255,255,0.07); border: 1px solid rgba(255,255,255,0.1);
+      display: flex; align-items: center; justify-content: center;
+      color: rgba(255,255,255,0.55); text-decoration: none; font-size: 0.8rem; font-weight: 700;
+      transition: background 0.2s, color 0.2s;
+    }
+    .social-btn:hover { background: var(--gold); color: var(--navy); border-color: var(--gold); }
+    .footer-col h5 {
+      color: var(--white); font-size: 0.82rem; font-weight: 700;
+      letter-spacing: 0.5px; margin-bottom: 16px;
+    }
+    .footer-col ul { list-style: none; display: flex; flex-direction: column; gap: 10px; }
+    .footer-col ul li a {
+      color: rgba(255,255,255,0.45); font-size: 0.85rem; text-decoration: none;
+      transition: color 0.2s;
+    }
+    .footer-col ul li a:hover { color: var(--gold); }
+    .footer-bottom {
+      border-top: 1px solid rgba(255,255,255,0.06);
+      padding-top: 28px;
+      display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 12px;
+    }
+    .footer-bottom p { color: rgba(255,255,255,0.3); font-size: 0.8rem; }
+    .footer-bottom-links { display: flex; gap: 20px; }
+    .footer-bottom-links a {
+      color: rgba(255,255,255,0.3); font-size: 0.8rem;
+      text-decoration: none; transition: color 0.2s;
+    }
+    .footer-bottom-links a:hover { color: rgba(255,255,255,0.6); }
+
+    /* ── ANNOUNCEMENT BAR ── */
+    .ann-bar {
+      background: var(--gold); text-align: center; padding: 10px 20px;
+      position: fixed; top: 0; left: 0; right: 0; z-index: 1001;
+    }
+    .ann-bar p {
+      font-size: 0.82rem; font-weight: 600; color: var(--navy);
+      display: flex; align-items: center; justify-content: center; gap: 10px;
+    }
+    .ann-bar a { color: var(--navy); font-weight: 700; text-decoration: underline; }
+    nav { top: 40px; }
+
+    /* ── RESPONSIVE ── */
+    @media (max-width: 1024px) {
+      .products-grid { grid-template-columns: repeat(2,1fr); }
+      .steps-grid { grid-template-columns: repeat(2,1fr); }
+      .steps-grid::before { display: none; }
+      .footer-top { grid-template-columns: 1fr 1fr; }
+    }
+    @media (max-width: 768px) {
+      .hero-inner, .solutions-layout, .stats-inner { grid-template-columns: 1fr; }
+      .hero h1 { font-size: 2.2rem; }
+      .products-grid, .testi-grid { grid-template-columns: 1fr; }
+      .steps-grid { grid-template-columns: 1fr; }
+      .footer-top { grid-template-columns: 1fr 1fr; }
+      .nav-links { display: none; }
+      .trust-logos { gap: 24px; }
+      .hero-visual { display: none; }
+    }
+  </style>
+</head>
+<body>
+
+<!-- ANNOUNCEMENT BAR -->
+<div class="ann-bar">
+  <p>
+    🔐 New: VaultAxis AI-Powered Threat Detection is here.
+    <a href="#">Read the announcement →</a>
+  </p>
+</div>
+
+<!-- NAVBAR -->
+<nav>
+  <a href="#" class="nav-logo">
+    <div class="nav-logo-icon">
+      <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <path d="M12 2L4 6v6c0 5.25 3.5 10.15 8 11.35C16.5 22.15 20 17.25 20 12V6L12 2Z" fill="#07142a" stroke="#07142a" stroke-width="0.5"/>
+        <path d="M12 5L6.5 8v4.5c0 3.9 2.6 7.55 5.5 8.45 2.9-.9 5.5-4.55 5.5-8.45V8L12 5Z" fill="rgba(255,255,255,0.15)"/>
+        <path d="M9 12l2 2 4-4" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+      </svg>
+    </div>
+    <span class="nav-logo-text">Vault<span>Axis</span></span>
+  </a>
+
+  <ul class="nav-links">
+    <li>
+      <a href="#">Products <span class="chevron"></span></a>
+      <div class="dropdown">
+        <div class="dropdown-label">Identity Security</div>
+        <a href="#">Privileged Access Manager</a>
+        <a href="#">Secrets Manager</a>
+        <a href="#">Identity Verification</a>
+        <div class="dropdown-label">Workforce</div>
+        <a href="#">Single Sign-On (SSO)</a>
+        <a href="#">Multi-Factor Authentication</a>
+        <a href="#">Directory Services</a>
+      </div>
+    </li>
+    <li>
+      <a href="#">Solutions <span class="chevron"></span></a>
+      <div class="dropdown">
+        <div class="dropdown-label">By Use Case</div>
+        <a href="#">Zero Trust Security</a>
+        <a href="#">Cloud Security</a>
+        <a href="#">DevSecOps</a>
+        <div class="dropdown-label">By Industry</div>
+        <a href="#">Financial Services</a>
+        <a href="#">Healthcare</a>
+        <a href="#">Government</a>
+      </div>
+    </li>
+    <li>
+      <a href="#">Resources <span class="chevron"></span></a>
+      <div class="dropdown">
+        <a href="#">Documentation</a>
+        <a href="#">Blog & Insights</a>
+        <a href="#">Case Studies</a>
+        <a href="#">Webinars</a>
+        <a href="#">Community Forum</a>
+      </div>
+    </li>
+    <li>
+      <a href="#">Partners <span class="chevron"></span></a>
+      <div class="dropdown">
+        <a href="#">Partner Program</a>
+        <a href="#">Technology Alliances</a>
+        <a href="#">Marketplace</a>
+      </div>
+    </li>
+    <li><a href="#">Company</a></li>
+  </ul>
+
+  <div class="nav-actions">
+    <a href="#" class="btn-ghost">Log In</a>
+    <a href="#" class="btn-cta">Get a Demo</a>
+  </div>
+</nav>
+
+<!-- HERO -->
+<section class="hero">
+  <div class="hero-inner">
+    <div class="hero-content">
+      <div class="hero-badge">Identity Security Platform</div>
+      <h1>Secure Every <em>Identity,</em><br>Everywhere It Acts</h1>
+      <p>VaultAxis is the leader in identity security — protecting human and machine identities from the #1 attack vector with AI-powered, continuous threat detection and adaptive access controls.</p>
+      <div class="hero-btns">
+        <a href="#" class="btn-primary">Get a Demo</a>
+        <a href="#" class="btn-outline">Explore Platform</a>
+      </div>
+    </div>
+
+    <div class="hero-visual">
+      <div class="float-badge float-badge-1">
+        <div class="dot-teal"></div>
+        Threat blocked · 2s ago
+      </div>
+      <div class="float-badge float-badge-2">
+        <div class="dot-gold"></div>
+        Identity verified · Just now
+      </div>
+      <div class="hero-card">
+        <div class="hero-card-title">🛡 VaultAxis Shield · Active</div>
+        <div class="shield-wrap">
+          <svg class="shield-svg" viewBox="0 0 120 140" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <path d="M60 8L12 30v40c0 35 22 67 48 77 26-10 48-42 48-77V30L60 8Z" fill="url(#sg)" opacity="0.2"/>
+            <path d="M60 8L12 30v40c0 35 22 67 48 77 26-10 48-42 48-77V30L60 8Z" stroke="#e8a020" stroke-width="2.5" fill="none"/>
+            <path d="M60 24L26 41v28c0 24 15.5 47 34 54.5C78.5 116 94 93 94 69V41L60 24Z" fill="rgba(232,160,32,0.1)"/>
+            <path d="M43 70l12 12 24-22" stroke="#e8a020" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"/>
+            <defs>
+              <linearGradient id="sg" x1="12" y1="8" x2="108" y2="132" gradientUnits="userSpaceOnUse">
+                <stop stop-color="#e8a020"/>
+                <stop offset="1" stop-color="#00c4b3"/>
+              </linearGradient>
+            </defs>
+          </svg>
+        </div>
+        <div class="hero-stat-row">
+          <div class="hero-stat">
+            <div class="num">99.9<span style="font-size:1rem">%</span></div>
+            <div class="lbl">Uptime SLA</div>
+          </div>
+          <div class="hero-stat">
+            <div class="num">2M<span style="font-size:1rem">+</span></div>
+            <div class="lbl">Identities Protected</div>
+          </div>
+          <div class="hero-stat">
+            <div class="num">0</div>
+            <div class="lbl">Breaches Today</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- TRUST BAR -->
+<div class="trust">
+  <div class="trust-inner">
+    <p>Trusted by 7,500+ organizations worldwide, including 80% of the Fortune 500</p>
+    <div class="trust-logos">
+      <span class="trust-logo">MERIDIAN BANK</span>
+      <span class="trust-logo">NEXACLOUD</span>
+      <span class="trust-logo">GLOBALHEALTH</span>
+      <span class="trust-logo">STRATA GOV</span>
+      <span class="trust-logo">PINNACLE ENERGY</span>
+      <span class="trust-logo">AXON LOGISTICS</span>
+    </div>
+  </div>
+</div>
+
+<!-- PRODUCTS -->
+<section class="products">
+  <div class="section-inner">
+    <div class="section-header center">
+      <div class="section-label">Our Platform</div>
+      <h2 class="section-title">Everything You Need to Secure<br>Every Identity</h2>
+      <p class="section-sub">From privileged users to machine identities and everything in between — VaultAxis covers the entire identity attack surface.</p>
+    </div>
+    <div class="products-grid">
+      <div class="prod-card">
+        <div class="prod-icon" style="background:rgba(232,160,32,0.12)">🔐</div>
+        <h3>Privileged Access Manager</h3>
+        <p>Discover, onboard, and secure privileged accounts across hybrid and multi-cloud environments with zero-standing privilege.</p>
+        <a href="#" class="prod-link">Learn more</a>
+      </div>
+      <div class="prod-card">
+        <div class="prod-icon" style="background:rgba(0,196,179,0.12)">🔑</div>
+        <h3>Secrets Manager</h3>
+        <p>Centrally manage, rotate, and audit secrets, credentials, and API keys used by applications, CI/CD pipelines, and DevOps tools.</p>
+        <a href="#" class="prod-link">Learn more</a>
+      </div>
+      <div class="prod-card">
+        <div class="prod-icon" style="background:rgba(100,149,237,0.12)">🛡️</div>
+        <h3>Endpoint Privilege Security</h3>
+        <p>Remove local admin rights and apply just-in-time privilege elevation on endpoints — stopping attackers before they move laterally.</p>
+        <a href="#" class="prod-link">Learn more</a>
+      </div>
+      <div class="prod-card">
+        <div class="prod-icon" style="background:rgba(232,160,32,0.12)">👤</div>
+        <h3>Identity Verification</h3>
+        <p>AI-powered adaptive MFA and biometric verification that ensures every user is who they claim to be — at every access point.</p>
+        <a href="#" class="prod-link">Learn more</a>
+      </div>
+      <div class="prod-card">
+        <div class="prod-icon" style="background:rgba(0,196,179,0.12)">☁️</div>
+        <h3>Cloud Entitlements Manager</h3>
+        <p>Gain full visibility and control over permissions across AWS, Azure, and GCP — enforcing least privilege at cloud scale.</p>
+        <a href="#" class="prod-link">Learn more</a>
+      </div>
+      <div class="prod-card">
+        <div class="prod-icon" style="background:rgba(100,149,237,0.12)">🤖</div>
+        <h3>AI Identity Security</h3>
+        <p>Continuously analyze identity behavior with ML models to detect anomalous access patterns and automatically contain threats.</p>
+        <a href="#" class="prod-link">Learn more</a>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- SOLUTIONS -->
+<section class="solutions">
+  <div class="section-inner">
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:60px;align-items:center;">
+      <div>
+        <div class="section-label">Use Cases</div>
+        <h2 class="section-title">Built for the<br>Challenges You Face</h2>
+        <div class="solutions-tabs" style="margin-top:32px">
+          <div class="sol-tab active">
+            <div class="sol-num">01 — Zero Trust</div>
+            <h4>Zero Trust Architecture</h4>
+            <p>Enforce continuous verification for every user, device, and workload — never trust, always verify.</p>
+          </div>
+          <div class="sol-tab">
+            <div class="sol-num">02 — Cloud</div>
+            <h4>Cloud &amp; Multi-Cloud Security</h4>
+            <p>Secure identities and entitlements across AWS, Azure, GCP, and hybrid environments at scale.</p>
+          </div>
+          <div class="sol-tab">
+            <div class="sol-num">03 — DevSecOps</div>
+            <h4>DevSecOps &amp; Developer Access</h4>
+            <p>Embed secrets management and developer-friendly access controls into every CI/CD pipeline.</p>
+          </div>
+          <div class="sol-tab">
+            <div class="sol-num">04 — Compliance</div>
+            <h4>Regulatory Compliance</h4>
+            <p>Meet SOC 2, ISO 27001, PCI-DSS, HIPAA, and government security mandates with automated audit trails.</p>
+          </div>
+        </div>
+      </div>
+      <div class="solutions-visual">
+        <div class="sol-vis-label">Zero Trust Architecture</div>
+        <div class="sol-vis-title">Never Trust.<br>Always Verify.</div>
+        <div class="sol-vis-desc">Establish a security perimeter that assumes breach and validates every access request in real time — no implicit trust granted anywhere in your environment.</div>
+        <ul class="sol-features">
+          <li>Continuous identity verification at every step</li>
+          <li>Risk-based adaptive access policies</li>
+          <li>Just-in-time access with automatic revocation</li>
+          <li>Full session recording and audit trails</li>
+          <li>Integration with SIEM, SOAR, and XDR tools</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- STATS -->
+<section class="stats">
+  <div class="stats-inner">
+    <div class="stats-text">
+      <div class="section-label" style="color:var(--gold)">By the Numbers</div>
+      <h2 style="color:var(--white);font-size:2.4rem;font-weight:800;line-height:1.2;margin-bottom:20px">
+        The World's Most Trusted Identity Security Platform
+      </h2>
+      <p style="color:rgba(255,255,255,0.6);font-size:1rem;line-height:1.7;margin-bottom:32px">
+        From startups to global enterprises, VaultAxis protects the identities that power the modern digital world.
+      </p>
+      <a href="#" class="btn-primary">See Customer Stories</a>
+    </div>
+    <div class="stats-grid">
+      <div class="stat-box">
+        <div class="stat-num">7,500<span class="stat-suffix">+</span></div>
+        <div class="stat-lbl">Global Customers</div>
+      </div>
+      <div class="stat-box">
+        <div class="stat-num">110<span class="stat-suffix">+</span></div>
+        <div class="stat-lbl">Countries Served</div>
+      </div>
+      <div class="stat-box">
+        <div class="stat-num">80<span class="stat-suffix">%</span></div>
+        <div class="stat-lbl">of Fortune 500 Companies</div>
+      </div>
+      <div class="stat-box">
+        <div class="stat-num">2M<span class="stat-suffix">+</span></div>
+        <div class="stat-lbl">Identities Protected Daily</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- HOW IT WORKS -->
+<section class="how">
+  <div class="section-inner">
+    <div class="section-header center">
+      <div class="section-label">How It Works</div>
+      <h2 class="section-title">Deployed in Days. Secured for Years.</h2>
+      <p class="section-sub">VaultAxis is designed for rapid deployment and seamless integration with your existing stack — no rip and replace required.</p>
+    </div>
+    <div class="steps-grid" style="margin-top:60px">
+      <div class="step">
+        <div class="step-num">1</div>
+        <h4>Discover</h4>
+        <p>Automatically discover all human and machine identities across your on-prem, cloud, and hybrid environments.</p>
+      </div>
+      <div class="step">
+        <div class="step-num">2</div>
+        <h4>Protect</h4>
+        <p>Apply least-privilege policies, vault credentials, and enforce MFA and session controls at every access point.</p>
+      </div>
+      <div class="step">
+        <div class="step-num">3</div>
+        <h4>Detect</h4>
+        <p>Continuously analyze identity behavior with AI to surface anomalies and risky access patterns in real time.</p>
+      </div>
+      <div class="step">
+        <div class="step-num">4</div>
+        <h4>Respond</h4>
+        <p>Automatically contain threats, revoke sessions, and trigger playbooks — minimizing breach impact instantly.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- TESTIMONIALS -->
+<section class="testimonials">
+  <div class="section-inner">
+    <div class="section-header center">
+      <div class="section-label">Customer Stories</div>
+      <h2 class="section-title">Trusted by Security Leaders Worldwide</h2>
+    </div>
+    <div class="testi-grid">
+      <div class="testi-card">
+        <div class="testi-stars">★★★★★</div>
+        <blockquote>"VaultAxis transformed our privileged access program. We went from months of manual processes to automated, real-time protection across 200+ cloud accounts in just six weeks."</blockquote>
+        <div class="testi-person">
+          <div class="testi-avatar" style="background:linear-gradient(135deg,#e8a020,#f5b93e)">JS</div>
+          <div>
+            <div class="testi-name">Jordan S.</div>
+            <div class="testi-role">CISO, Meridian Financial Group</div>
+          </div>
+        </div>
+      </div>
+      <div class="testi-card">
+        <div class="testi-stars">★★★★★</div>
+        <blockquote>"The AI-powered anomaly detection caught a compromised service account during a weekend — something our team would have missed. That single catch justified the entire investment."</blockquote>
+        <div class="testi-person">
+          <div class="testi-avatar" style="background:linear-gradient(135deg,#00c4b3,#00a896)">AP</div>
+          <div>
+            <div class="testi-name">Anika P.</div>
+            <div class="testi-role">VP of Security Engineering, NexaCloud</div>
+          </div>
+        </div>
+      </div>
+      <div class="testi-card">
+        <div class="testi-stars">★★★★★</div>
+        <blockquote>"We had a compliance deadline looming. VaultAxis gave us the audit trails, reporting, and access controls we needed to pass our SOC 2 Type II audit without a single exception."</blockquote>
+        <div class="testi-person">
+          <div class="testi-avatar" style="background:linear-gradient(135deg,#6495ed,#4169e1)">MR</div>
+          <div>
+            <div class="testi-name">Marcus R.</div>
+            <div class="testi-role">Director of IT Risk, Strata Government Solutions</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- CTA BANNER -->
+<section class="cta-banner">
+  <h2>Ready to Secure Every <em>Identity?</em></h2>
+  <p>Join 7,500+ organizations that trust VaultAxis to protect their most critical identities and assets.</p>
+  <div class="hero-btns">
+    <a href="#" class="btn-primary">Get a Free Demo</a>
+    <a href="#" class="btn-outline">Talk to Sales</a>
+  </div>
+</section>
+
+<!-- FOOTER -->
+<footer>
+  <div class="footer-inner">
+    <div class="footer-top">
+      <div class="footer-brand">
+        <a href="#" class="nav-logo" style="margin-bottom:0">
+          <div class="nav-logo-icon">
+            <svg viewBox="0 0 24 24" fill="none">
+              <path d="M12 2L4 6v6c0 5.25 3.5 10.15 8 11.35C16.5 22.15 20 17.25 20 12V6L12 2Z" fill="#07142a"/>
+              <path d="M12 5L6.5 8v4.5c0 3.9 2.6 7.55 5.5 8.45 2.9-.9 5.5-4.55 5.5-8.45V8L12 5Z" fill="rgba(255,255,255,0.15)"/>
+              <path d="M9 12l2 2 4-4" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+          </div>
+          <span class="nav-logo-text">Vault<span>Axis</span></span>
+        </a>
+        <p>The global leader in Identity Security — protecting the human and machine identities that power your business.</p>
+        <div class="footer-socials">
+          <a href="#" class="social-btn">in</a>
+          <a href="#" class="social-btn">𝕏</a>
+          <a href="#" class="social-btn">YT</a>
+          <a href="#" class="social-btn">GH</a>
+        </div>
+      </div>
+      <div class="footer-col">
+        <h5>Products</h5>
+        <ul>
+          <li><a href="#">Privileged Access Manager</a></li>
+          <li><a href="#">Secrets Manager</a></li>
+          <li><a href="#">Endpoint Security</a></li>
+          <li><a href="#">Cloud Entitlements</a></li>
+          <li><a href="#">Identity Verification</a></li>
+          <li><a href="#">AI Security</a></li>
+        </ul>
+      </div>
+      <div class="footer-col">
+        <h5>Solutions</h5>
+        <ul>
+          <li><a href="#">Zero Trust</a></li>
+          <li><a href="#">Cloud Security</a></li>
+          <li><a href="#">DevSecOps</a></li>
+          <li><a href="#">Compliance</a></li>
+          <li><a href="#">Financial Services</a></li>
+          <li><a href="#">Healthcare</a></li>
+        </ul>
+      </div>
+      <div class="footer-col">
+        <h5>Resources</h5>
+        <ul>
+          <li><a href="#">Documentation</a></li>
+          <li><a href="#">Blog</a></li>
+          <li><a href="#">Case Studies</a></li>
+          <li><a href="#">Webinars</a></li>
+          <li><a href="#">Community</a></li>
+          <li><a href="#">Status Page</a></li>
+        </ul>
+      </div>
+      <div class="footer-col">
+        <h5>Company</h5>
+        <ul>
+          <li><a href="#">About Us</a></li>
+          <li><a href="#">Careers</a></li>
+          <li><a href="#">Newsroom</a></li>
+          <li><a href="#">Partners</a></li>
+          <li><a href="#">Investors</a></li>
+          <li><a href="#">Contact</a></li>
+        </ul>
+      </div>
+    </div>
+    <div class="footer-bottom">
+      <p>© 2026 VaultAxis, Inc. All rights reserved.</p>
+      <div class="footer-bottom-links">
+        <a href="#">Privacy Policy</a>
+        <a href="#">Terms of Service</a>
+        <a href="#">Cookie Settings</a>
+        <a href="#">Accessibility</a>
+        <a href="#">Sitemap</a>
+      </div>
+    </div>
+  </div>
+</footer>
+
+<script>
+  // Tab switching in solutions section
+  document.querySelectorAll('.sol-tab').forEach((tab, i) => {
+    tab.addEventListener('click', () => {
+      document.querySelectorAll('.sol-tab').forEach(t => t.classList.remove('active'));
+      tab.classList.add('active');
+      const titles = [
+        ['Zero Trust Architecture', 'Never Trust.<br>Always Verify.', 'Establish a security perimeter that assumes breach and validates every access request in real time — no implicit trust granted anywhere in your environment.'],
+        ['Cloud & Multi-Cloud Security', 'Secure the<br>Cloud at Scale.', 'Manage and enforce least privilege across AWS, Azure, and GCP — with full visibility into every entitlement and permission drift.'],
+        ['DevSecOps', 'Security<br>Built into DevOps.', 'Embed identity security into your pipelines so developers ship fast without compromising secrets, credentials, or access controls.'],
+        ['Regulatory Compliance', 'Audit-Ready<br>by Design.', 'Automated access reviews, session recording, and compliance reports that satisfy SOC 2, PCI-DSS, HIPAA, and more.'],
+      ];
+      const vis = document.querySelector('.solutions-visual');
+      vis.querySelector('.sol-vis-label').textContent = titles[i][0];
+      vis.querySelector('.sol-vis-title').innerHTML = titles[i][1];
+      vis.querySelector('.sol-vis-desc').textContent = titles[i][2];
+    });
+  });
+
+  // Animate stat numbers
+  const observer = new IntersectionObserver((entries) => {
+    entries.forEach(entry => {
+      if (entry.isIntersecting) {
+        entry.target.querySelectorAll('.stat-num').forEach(el => {
+          el.style.animation = 'none';
+          el.offsetHeight;
+          el.style.animation = 'fadeUp 0.5s ease forwards';
+        });
+      }
+    });
+  }, { threshold: 0.3 });
+  document.querySelectorAll('.stats-grid').forEach(el => observer.observe(el));
+
+  // Smooth tab hover effect
+  document.querySelectorAll('.sol-tab').forEach(tab => {
+    tab.addEventListener('mouseenter', function() {
+      if (!this.classList.contains('active')) {
+        this.style.background = 'var(--light)';
+      }
+    });
+    tab.addEventListener('mouseleave', function() {
+      if (!this.classList.contains('active')) {
+        this.style.background = '';
+      }
+    });
+  });
+</script>
+</body>
+</html>
